@@ -21,7 +21,7 @@ class User(AbstractBaseUser):
     password = models.CharField(max_length=30, blank=False, null=False)
     full_name = models.CharField(max_length=100, blank=False, null=False)
     tipo_usuario = models.CharField(max_length=20, choices=TypeUser.CHOICES, default=TypeUser.CLIENTE)
-    estabelecimento = models.ForeignKey('estabelecimento.Estabelecimento', on_delete=models.CASCADE)
+    estabelecimento = models.ForeignKey('estabelecimento.Estabelecimento', on_delete=models.CASCADE, related_name='equipe_funcionarios')
     
     
     
@@ -32,7 +32,7 @@ class User(AbstractBaseUser):
 
 class Funcionario(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE)
     estabelecimento = models.ForeignKey('estabelecimento.Estabelecimento', on_delete=models.CASCADE)
     
     def __str__(self):

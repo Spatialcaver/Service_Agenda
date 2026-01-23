@@ -28,8 +28,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Agenda',
-    'auth', 
-    'reserva', 
+    'user', 
+    'reserva',
+    'estabelecimento',
     
 ]
 
