@@ -20,14 +20,27 @@ class ServicosChoices:
 class Estabelecimento (models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     nome = models.CharField(max_length=50)
-    funcionario = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    proprietario = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     endereco = models.CharField(max_length=200)
-    horario_funcionamento = models.DateTimeField(null=True, blank=True)
-    dia_funcionamento = models.CharField(max_length=30, blank=True)
-    servicos = models.CharField(max_length=200, null=True, blank=True, choices=ServicosChoices.CHOICES)
+    horario_abertura= models.TimeField(null=False, blank=False)
+    horario_fechamento = models.TimeField(null=False, blank=False)
+    dia_funcionamento = models.CharField(max_length=30, blank=False)
+    
     
     
     
     def __str__(self):
         return f'{self.id},{self.nome}, '
     
+
+
+class Servicos(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    servico = models.CharField(max_length=50, choices=ServicosChoices.CHOICES)
+    responsavel = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    estabelecimento = models.ForeignKey('estabelecimento.Estabelecimento', on_delete=models.CASCADE)
+    preco = models.DecimalField(max_digits=10, decimal_places=2)
+    duracao = models.DurationField()
+    
+    def __str__(self):
+        return f'{self.id},{self.nome}, {self.estabelecimento}'
