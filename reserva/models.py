@@ -1,3 +1,15 @@
 from django.db import models
+from estabelecimento.models import Estabelecimento, Servicos 
+from user.models import Funcionario
 
-# Create your models here.
+class Reserva(models.Model):
+    data = models.DateField()
+    hora = models.TimeField()
+    cliente = models.CharField(max_length=100)
+    telefone = models.CharField(max_length=20)
+    servico = models.ForeignKey(Servicos, on_delete=models.CASCADE)
+    estabelecimento = models.ForeignKey(Estabelecimento, on_delete=models.CASCADE)
+    funcionario = models.ForeignKey(Funcionario, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f'{self.id}, {self.data}, {self.hora}, {self.cliente}, {self.telefone}, {self.servico}, {self.estabelecimento}, {self.funcionario}'
