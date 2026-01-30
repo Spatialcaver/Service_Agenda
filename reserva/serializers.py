@@ -5,18 +5,35 @@ from estabelecimento.models import Estabelecimento, Servicos
 from reserva.models import Reserva
 
 class ReservaSerializer(serializers.ModelSerializer):
-    cliente = serializers.CharField(source='User.full_name', read_only=True)
-    estabelecimento = serializers.CharField(source='Estabelecimento.nome', read_only=True)
-    funcionario = serializers.CharField(source='Funcionario.user.full_name', read_only=True)
-    servico = serializers.CharField(source='Servicos.servico', read_only=True)
-
     class Meta:
         model = Reserva
-        fields = ['data', 'hora', 'cliente', 'telefone', 'servico', 'estabelecimento', 'funcionario']
-        read_only_fields = ['id']
-        required_fields = ['data', 'hora', 'cliente', 'telefone', 'servico', 'estabelecimento', 'funcionario']
-    
-    def validate(self, attrs):
-        if attrs['data'] < datetime.date.today():
-            raise serializers.ValidationError("A data deve ser maior ou igual a hoje.")
-        return attrs
+        fields = '__all__'
+
+    def validate(self, data):
+        funcionario = data['funcionario']
+        data_res = data['data']
+        hora_res = data['hora']
+        servico = data['servico']
+
+        # Cálculo do intervalo pretendido
+        inicio_pretendido = datetime.combine(data_res, hora_res)
+        fim_pretendido = inicio_pretendido + servico.duracao
+        hora_fim_pretendida = fim_pretendido.time()
+
+        # Verifica se o funcionário já tem reserva que sobreponha este horário
+        # Regra: (Inicio1 < Fim2) E (Fim1 > Inicio2)
+        reservas_existentes = Reserva.objects.filter(
+            funcionario=funcionario,
+            data=data_res
+        )
+
+        for reserva in reservas_existentes:
+            res_inicio = reserva.hora
+            res_fim = (datetime.combine(reserva.data, reserva.hora) + reserva.servico.duracao).time()
+
+            if hora_res < res_fim and hora_fim_pretendida > res_inicio:
+                raise serializers.ValidationError(
+                    f"O funcionário {funcionario.nome} já possui um agendamento que conflita com este horário."
+                )
+
+        return data

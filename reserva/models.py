@@ -3,6 +3,22 @@ from estabelecimento.models import Estabelecimento, Servicos
 from user.models import Funcionario
 from datetime import datetime, timedelta
 
+
+
+class StatusReserva(models.Model):
+   PENDENTE = 'Pendente'
+   CONFIRMADO = 'Confirmado'
+   CANCELADO = 'Cancelado'
+   CONCLUIDO = 'Concluído'
+   STATUS_CHOICES = (
+        (PENDENTE, 'Pendente'),
+        (CONFIRMADO, 'Confirmado'),
+        (CANCELADO, 'Cancelado'),
+        (CONCLUIDO, 'Concluído'),
+    )
+    
+
+
 class Reserva(models.Model):
     data = models.DateField()
     hora = models.TimeField()
@@ -23,12 +39,12 @@ class Reserva(models.Model):
         on_delete=models.CASCADE, 
         related_name='reservas_do_funcionario'
     )
-
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendente')
 
     @property
     def hora_fim(self):
         inicio = datetime.combine(self.data, self.hora)
-        fim = inicio + timedelta(minutes=self.servico.duracao)
+        fim = inicio + self.servico.duracao
         return fim.time()
     def __str__(self):
         return f'{self.id}, {self.data}, {self.hora}, {self.cliente}, {self.telefone}, {self.servico}, {self.estabelecimento}, {self.funcionario}'
