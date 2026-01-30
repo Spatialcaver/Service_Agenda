@@ -13,8 +13,5 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/user/', include('user.urls')),
-    
-    # Rotas manuais para as APIViews de reserva
-    path('api/reserva/', ReservaView.as_view(), name='reserva'),
-    path('api/disponibilidade/', DisponibilidadeView.as_view(), name='disponibilidade'),
+    path('api/reserva/', include('reserva.urls')),   
 ]

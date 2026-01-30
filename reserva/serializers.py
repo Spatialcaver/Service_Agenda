@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Reserva
 from user.models import User
 from estabelecimento.models import Estabelecimento, Servicos
+from datetime import datetime
 from reserva.models import Reserva
 
 class ReservaSerializer(serializers.ModelSerializer):

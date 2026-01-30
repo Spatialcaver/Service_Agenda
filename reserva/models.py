@@ -39,7 +39,7 @@ class Reserva(models.Model):
         on_delete=models.CASCADE, 
         related_name='reservas_do_funcionario'
     )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendente')
+    status = models.CharField(max_length=20, choices=StatusReserva.STATUS_CHOICES, default=StatusReserva.PENDENTE)
 
     @property
     def hora_fim(self):
