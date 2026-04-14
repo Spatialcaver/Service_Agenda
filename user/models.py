@@ -18,13 +18,26 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('O email deve ser informado')
         email = self.normalize_email(email)
+        
+        # Garante que o usuário seja criado como ativo por padrão
+        extra_fields.setdefault('is_active', True)
+        
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
+        # Campos obrigatórios para o Django Admin
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('tipo_usuario', TypeUser.ADMINISTRADOR)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser precisa ter is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser precisa ter is_superuser=True.')
+
         return self.create_user(email, password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -36,6 +49,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name']
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.id},{self.email}, {self.full_name}'

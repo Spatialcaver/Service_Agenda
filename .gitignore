@@ -12,6 +12,7 @@ env/
 dist/
 build/
 .python-version
+.env
 
 ### --- Node / Next.js --- ###
 node_modules/
