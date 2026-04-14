@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Reserva
 from user.models import User
+from django.utils import timezone
 from estabelecimento.models import Estabelecimento, Servicos
 from datetime import datetime
 from reserva.models import Reserva
@@ -15,6 +16,9 @@ class ReservaSerializer(serializers.ModelSerializer):
         data_res = data['data']
         hora_res = data['hora']
         servico = data['servico']
+        
+        if data_res < timezone.now().date():
+            raise serializers.ValidationError("A data da reserva não pode ser no passado.")
 
         # Cálculo do intervalo pretendido
         inicio_pretendido = datetime.combine(data_res, hora_res)
@@ -26,7 +30,7 @@ class ReservaSerializer(serializers.ModelSerializer):
         reservas_existentes = Reserva.objects.filter(
             funcionario=funcionario,
             data=data_res
-        )
+        ).exclude(status=Reserva.StatusReserva.CANCELADA)
 
         for reserva in reservas_existentes:
             res_inicio = reserva.hora

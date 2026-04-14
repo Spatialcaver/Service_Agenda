@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 import uuid
@@ -63,3 +64,28 @@ class Funcionario(models.Model):
     
     def __str__(self):
         return f'{self.id}, {self.user}, {self.estabelecimento}'
+    
+    
+    
+class Pausas:
+    ALMOCO = 'Almoço'
+    FIM_EXPEDIENTE = 'Fim do Expediente'
+    INDISPONIVEL = 'Indisponível'
+
+    CHOICES = [
+        (ALMOCO, 'Almoço'),
+        (FIM_EXPEDIENTE, 'Fim do Expediente'),
+        (INDISPONIVEL, 'Indisponível')
+    ]
+    
+            
+class AusenciaFuncionario(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False, unique=True)
+    funcionario = models.ForeignKey(Funcionario, on_delete=models.CASCADE)
+    data = models.DateField(default=timezone.now)
+    hora_inicio = models.TimeField(default=timezone.now)
+    hora_fim = models.TimeField(blank= True, null=True)
+    motivo = models.CharField(max_length=50, choices=Pausas.CHOICES)
+
+    def __str__(self):
+        return f'{self.id}, {self.funcionario}, {self.data}, {self.hora_inicio}, {self.hora_fim}, {self.motivo}'
